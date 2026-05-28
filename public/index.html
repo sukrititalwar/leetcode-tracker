@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeetCode Tracker Replica</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-decor blob-1"></div>
+    <div class="background-decor blob-2"></div>
+    
+    <div class="container animate-fade-in">
+        <header>
+            <div class="logo-area">
+                <span class="logo-emoji">🎯</span>
+                <h1>LeetCode Tracker</h1>
+            </div>
+            <p class="subtitle">Track, compare, and verify LeetCode progress across users in real-time</p>
+        </header>
+
+        <div id="messageBanner" class="banner hidden"></div>
+
+        <section class="controls-panel">
+            <div class="control-box card animate-slide-up">
+                <h3>🔍 Check Problem Status</h3>
+                <p class="box-desc">Verify which users have solved a specific question</p>
+                <div class="input-group">
+                    <input type="text" id="questionInput" placeholder="Enter question name (e.g., 'Two Sum')">
+                    <button onclick="checkQuestion()" id="checkBtn">Check Question</button>
+                </div>
+            </div>
+
+            <div class="control-box card animate-slide-up" style="animation-delay: 0.1s;">
+                <h3>⚡ Real-Time Sync</h3>
+                <p class="box-desc">Force database sync with latest LeetCode stats</p>
+                <div class="sync-group">
+                    <button onclick="manualSync()" id="syncBtn" class="btn-secondary">Sync All Users</button>
+                    <span id="lastSyncedTime" class="sync-time">Last synced: Just now</span>
+                </div>
+            </div>
+
+            <div class="control-box card animate-slide-up" style="animation-delay: 0.15s;">
+                <h3>📝 Mark Solved</h3>
+                <p class="box-desc">Manually solve a question (by name or URL)</p>
+                <div class="input-group">
+                    <select id="userSelect" style="flex: 0.35; padding: 12px 10px; border: 1.5px solid var(--border); border-radius: var(--radius-md); font-family: inherit; font-size: 0.85rem; outline: none; background: #f8fafc; cursor: pointer;">
+                        <!-- Will be populated dynamically -->
+                    </select>
+                    <input type="text" id="manualQuestionInput" placeholder="Name or URL" style="flex: 0.65;">
+                    <button onclick="addManualSolve()" id="manualBtn" class="btn-secondary" style="padding: 12px 16px;">Solve</button>
+                </div>
+            </div>
+        </section>
+
+        <div id="checkResults" class="animate-slide-up hidden"></div>
+
+        <main class="table-container card animate-slide-up" style="animation-delay: 0.2s;">
+            <div class="table-header">
+                <h2>🏆 Leaderboard</h2>
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" placeholder="Search by name or ID..." onkeyup="filterUsers()">
+                </div>
+            </div>
+
+            <div id="tableLoading" class="loading-state">
+                <div class="spinner"></div>
+                <p>Fetching user details...</p>
+            </div>
+
+            <div class="table-responsive">
+                <table id="usersTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th class="rank-col">S No.</th>
+                            <th class="sortable" onclick="sortTable('name')">Name <span class="sort-icon">⇅</span></th>
+                            <th class="sortable" onclick="sortTable('username')">Leetcode ID <span class="sort-icon">⇅</span></th>
+                            <th class="sortable active" onclick="sortTable('total')">Q Done <span class="sort-icon">↓</span></th>
+                            <th class="sortable" onclick="sortTable('easy')">Easy <span class="sort-icon">⇅</span></th>
+                            <th class="sortable" onclick="sortTable('medium')">Medium <span class="sort-icon">⇅</span></th>
+                            <th class="sortable" onclick="sortTable('hard')">Hard <span class="sort-icon">⇅</span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersBody"></tbody>
+                </table>
+            </div>
+            
+            <div id="noUsersFound" class="no-results hidden">
+                <p>No users match your search criteria.</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Full screen loader -->
+    <div id="globalLoader" class="loader-overlay hidden">
+        <div class="loader-content">
+            <div class="spinner large"></div>
+            <p id="loaderMessage">Syncing data with LeetCode...</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

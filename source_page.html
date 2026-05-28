@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeetCode Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+            min-width: 250px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #48bb78;
+        }
+
+        .btn-secondary:hover {
+            background: #38a169;
+        }
+
+        .btn-danger {
+            background: #f56565;
+        }
+
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .success {
+            background: #c6f6d5;
+            color: #22543d;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: #f7fafc;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #2d3748;
+            border-bottom: 2px solid #e2e8f0;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        th:hover {
+            background: #edf2f7;
+        }
+
+        th.sortable::after {
+            content: ' ⇅';
+            opacity: 0.3;
+        }
+
+        th.sort-asc::after {
+            content: ' ↑';
+            opacity: 1;
+        }
+
+        th.sort-desc::after {
+            content: ' ↓';
+            opacity: 1;
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #4a5568;
+        }
+
+        tr:hover {
+            background: #f7fafc;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 0 4px;
+        }
+
+        .badge-easy {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .badge-medium {
+            background: #feebc8;
+            color: #7c2d12;
+        }
+
+        .badge-hard {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .check-result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+
+        .check-result h3 {
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+
+        .user-check {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid #e2e8f0;
+        }
+
+        .user-check.solved {
+            border-left-color: #48bb78;
+            background: #f0fff4;
+        }
+
+        .user-check.not-solved {
+            border-left-color: #f56565;
+            background: #fff5f5;
+        }
+
+        .status {
+            font-weight: 600;
+        }
+
+        .status.solved {
+            color: #22543d;
+        }
+
+        .status.not-solved {
+            color: #c53030;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 LeetCode Tracker</h1>
+        <p class="subtitle">Track and compare LeetCode progress across users</p>
+
+        <div id="message"></div>
+
+        <div class="controls">
+            <div class="input-group">
+                <input type="text" id="questionInput" placeholder="Enter question name (e.g., 'Two Sum')">
+                <button onclick="checkQuestion()">Check Question</button>
+            </div>
+        </div>
+
+        <div id="checkResults"></div>
+
+        <div id="loading" class="loading" style="display: none;">Loading...</div>
+
+        <table id="usersTable" style="display: none;">
+            <thead>
+                <tr>
+                    <th class="sortable" onclick="sortTable('username')">Username</th>
+                    <th class="sortable" onclick="sortTable('total')">Total</th>
+                    <th class="sortable" onclick="sortTable('easy')">Easy</th>
+                    <th class="sortable" onclick="sortTable('medium')">Medium</th>
+                    <th class="sortable" onclick="sortTable('hard')">Hard</th>
+                </tr>
+            </thead>
+            <tbody id="usersBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        const API_URL = 'https://leetques.vercel.app'; // Replace with your Vercel API URL
+        let users = [];
+        let sortColumn = 'total';
+        let sortDirection = 'desc';
+
+        async function fetchUsers() {
+            showLoading(true);
+            try {
+                const response = await fetch(`${API_URL}/users`);
+                users = await response.json();
+                console.log(users)
+                displayUsers();
+            } catch (error) {
+                showMessage('Error fetching users: ' + error.message, 'error');
+            }
+            showLoading(false);
+        }
+
+        function displayUsers() {
+            const tbody = document.getElementById('usersBody');
+            const table = document.getElementById('usersTable');
+            
+            if (users.length === 0) {
+                table.style.display = 'none';
+                return;
+            }
+
+            table.style.display = 'table';
+            tbody.innerHTML = '';
+
+            const sortedUsers = [...users].sort((a, b) => {
+                let aVal = a[sortColumn];
+                let bVal = b[sortColumn];
+                
+                if (typeof aVal === 'string') {
+                    aVal = aVal.toLowerCase();
+                    bVal = bVal.toLowerCase();
+                }
+
+                if (sortDirection === 'asc') {
+                    return aVal > bVal ? 1 : -1;
+                } else {
+                    return aVal < bVal ? 1 : -1;
+                }
+            });
+
+            sortedUsers.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${user.username}</strong></td>
+                    <td><strong>${user.total}</strong></td>
+                    <td><span class="badge badge-easy">Easy: ${user.easy}</span></td>
+                    <td><span class="badge badge-medium">Medium: ${user.medium}</span></td>
+                    <td><span class="badge badge-hard">Hard: ${user.hard}</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            updateSortIndicators();
+        }
+
+        function updateSortIndicators() {
+            document.querySelectorAll('th').forEach(th => {
+                th.classList.remove('sort-asc', 'sort-desc');
+            });
+            
+            const headers = document.querySelectorAll('th');
+            const columnIndex = ['username', 'total', 'easy', 'medium', 'hard'].indexOf(sortColumn);
+            
+            if (columnIndex !== -1) {
+                headers[columnIndex].classList.add(sortDirection === 'asc' ? 'sort-asc' : 'sort-desc');
+            }
+        }
+
+        function sortTable(column) {
+            if (sortColumn === column) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                sortDirection = 'desc';
+            }
+            displayUsers();
+        }
+
+        async function addUser() {
+            const username = document.getElementById('usernameInput').value.trim();
+            if (!username) {
+                showMessage('Please enter a username', 'error');
+                return;
+            }
+
+            showLoading(true);
+            try {
+                const response = await fetch(`${API_URL}/add`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail);
+                }
+
+                showMessage(`User ${username} added successfully!`, 'success');
+                document.getElementById('usernameInput').value = '';
+                await fetchUsers();
+            } catch (error) {
+                showMessage('Error adding user: ' + error.message, 'error');
+            }
+            showLoading(false);
+        }
+
+
+        async function checkQuestion() {
+            const question = document.getElementById('questionInput').value.trim();
+            if (!question) {
+                showMessage('Please enter a question name', 'error');
+                return;
+            }
+
+            showLoading(true);
+            try {
+                const response = await fetch(`${API_URL}/check/${question}`);
+                const results = await response.json();
+                displayCheckResults(question, results);
+            } catch (error) {
+                showMessage('Error checking question: ' + error.message, 'error');
+            }
+            showLoading(false);
+        }
+
+        function displayCheckResults(question, results) {
+            const container = document.getElementById('checkResults');
+            
+            if (results.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            const solvedCount = results.filter(r => r.has_solved).length;
+            
+            container.innerHTML = `
+                <div class="check-result">
+                    <h3>Question: "${question}" (${solvedCount}/${results.length} solved)</h3>
+                    ${results.map(r => `
+                        <div class="user-check ${r.has_solved ? 'solved' : 'not-solved'}">
+                            <span>${r.username}</span>
+                            <span class="status ${r.has_solved ? 'solved' : 'not-solved'}">
+                                ${r.has_solved ? '✓ Solved' : '✗ Not Solved'}
+                            </span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = type;
+            messageDiv.textContent = message;
+            messageDiv.style.display = 'block';
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        // Initialize
+        fetchUsers();
+    </script>
+</body>
+</html>
