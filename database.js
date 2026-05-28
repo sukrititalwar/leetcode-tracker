@@ -1,7 +1,9 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
-const dbPath = path.join(__dirname, 'leetcode_tracker.db');
+const dbPath = process.env.VERCEL
+  ? '/tmp/leetcode_tracker.db'
+  : path.join(__dirname, 'leetcode_tracker.db');
 const db = new sqlite3.Database(dbPath);
 
 function init() {

@@ -9,6 +9,23 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+let dbInitialized = false;
+async function ensureDbInitialized(req, res, next) {
+  if (!dbInitialized) {
+    try {
+      await db.init();
+      await db.seedUsers();
+      dbInitialized = true;
+    } catch (err) {
+      console.error('Database initialization failed:', err);
+      return res.status(500).json({ error: 'Database initialization failed: ' + err.message });
+    }
+  }
+  next();
+}
+
+app.use(ensureDbInitialized);
+
 // Helper to convert title to slug
 function toSlug(str) {
   return str
@@ -194,25 +211,28 @@ app.post('/api/submissions/add', async (req, res) => {
 });
 
 
-// Start application
-async function start() {
-  try {
-    await db.init();
-    await db.seedUsers();
-    
-    // Run initial sync in the background
-    syncAllData().catch(err => console.error('Initial sync failed:', err.message));
-    
-    // Set background sync interval (every 10 minutes)
-    setInterval(syncAllData, 10 * 60 * 1000);
-    
-    app.listen(PORT, () => {
-      console.log(`Server is running at http://localhost:${PORT}`);
-    });
-  } catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1);
+// Start application (local environment only)
+if (!process.env.VERCEL) {
+  async function start() {
+    try {
+      await db.init();
+      await db.seedUsers();
+      
+      // Run initial sync in the background
+      syncAllData().catch(err => console.error('Initial sync failed:', err.message));
+      
+      // Set background sync interval (every 10 minutes)
+      setInterval(syncAllData, 10 * 60 * 1000);
+      
+      app.listen(PORT, () => {
+        console.log(`Server is running at http://localhost:${PORT}`);
+      });
+    } catch (error) {
+      console.error('Failed to start server:', error);
+      process.exit(1);
+    }
   }
+  start();
 }
 
-start();
+module.exports = app;
